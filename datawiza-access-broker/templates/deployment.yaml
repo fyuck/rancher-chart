@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "datawiza-access-broker.fullname" . }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: datawiza-access-broker
+  template:
+    metadata:
+      labels:
+        app: datawiza-access-broker
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.containerPort }}
+        env:
+        - name: PROVISIONING_KEY
+          value: {{ .Values.PROVISIONING_KEY}}
+        - name: PROVISIONING_SECRET
+          value: {{ .Values.PROVISIONING_SECRET}}
+        - name: MC_URL
+          value: {{ .Values.MC_URL}}
+      # imagePullSecrets:
+      # - name: {{ .Values.imagePullSecrets }}
